@@ -1,0 +1,20 @@
+# python cache files
+__pycache__/
+
+# project files
+.idea/
+.coverage
+*.egg-info
+*_client
+coverage.xml
+.coverage.ltp*
+dist/
+htmlcov/
+run_tests.py
+
+# environment files
+db.sqlite3
+python_env
+pid.log
+venv/
+db_config.py

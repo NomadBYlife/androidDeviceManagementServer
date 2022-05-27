@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% load notifications_tags %}
+{% load static %}
+{% block extrahead %}
+<script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
+{% register_notify_callbacks callbacks='fill_notification_list' refresh_period=refresh_val %}
+{% endblock %}
+
+{% block messages %}
+    {% if messages %}
+    <ul class="messagelist">{% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+    {% endfor %}</ul>
+    {% endif %}
+    <strong>{% live_notify_list %}</strong>
+{% endblock messages %}
