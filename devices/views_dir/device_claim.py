@@ -52,7 +52,7 @@ def claim_device(request: HttpRequest, **kwargs) -> (bool, Union[Device, ClaimFa
     # TODO add logic for restarting devices
     #  handle off devices
     if ready_device is None:
-        # log.info(log_request(request, "No more devices available of type '%s'" % device_type))
+        log.info(log_request(request, "No more devices available of type '%s'" % device_type))
 
         if soon_device is not None:
             return False, ClaimFailure.wait
@@ -78,7 +78,7 @@ def claim_device(request: HttpRequest, **kwargs) -> (bool, Union[Device, ClaimFa
                 instance.__dict__[key] = kv_pairs.get(key)
             instance.save()
     except RuntimeError as e:
-        # log.critical(" ---DEBUG--- %s" % e)
+        log.critical(" ---DEBUG--- %s" % e)
         return False, ClaimFailure.retry
 
     # so we successfully searched the list of devices and while we decided on one of them the one we ended up going for
@@ -90,7 +90,7 @@ def claim_device(request: HttpRequest, **kwargs) -> (bool, Union[Device, ClaimFa
 def get(request: HttpRequest, **kwargs):
     device_type: str = kwargs.get('device_type')
     if not check_device_type_exists(device_type):
-        # log.info(log_request(request, "Device type unknown: '%s'" % device_type))
+        log.info(log_request(request, "Device type unknown: '%s'" % device_type))
         return HttpResponse("Device type '%s' unknown" % device_type, status=400)
 
     def make_409():
@@ -105,26 +105,23 @@ def get(request: HttpRequest, **kwargs):
             ClaimFailure.retry: claim_recurse,
             ClaimFailure.fail: make_503,
         }
-        # log.critical(" ---DEBUG--- comparing reason %s with %s" % (reason, ClaimFailure.fail))
+        log.critical(" ---DEBUG--- comparing reason %s with %s" % (reason, ClaimFailure.fail))
         return switch_map.get(reason)()
 
     def claim_recurse():
         (success, elem2) = claim_device(request, **kwargs)
         if not success:
-            # log.critical(" ---DEBUG--- %s %s" % (success, elem2))
+            log.critical(" ---DEBUG--- %s %s" % (success, elem2))
             return response_switch(elem2)
         # else
 
         device_dict = elem2.as_dict()
-        print(device_dict)
         device_ip = device_dict['ip']
-        print(device_ip)
         device_port = device_dict['port']
-        print(device_port)
-        # log.info(log_request(request, "Device: ip '%s' port '%s' allocated to '%s'" %
-        #                      (device_ip, device_port, request.META['REMOTE_ADDR'])))
-        # log.critical(log_request(request, "Device: ip '%s' port '%s' allocated to '%s'" %
-        #                      (device_ip, device_port, request.META['REMOTE_ADDR'])))
+        log.info(log_request(request, "Device: ip '%s' port '%s' allocated to '%s'" %
+                             (device_ip, device_port, request.META['REMOTE_ADDR'])))
+        log.critical(log_request(request, "Device: ip '%s' port '%s' allocated to '%s'" %
+                             (device_ip, device_port, request.META['REMOTE_ADDR'])))
         return HttpResponse("%s:%s" % (device_ip, device_port))
 
     return claim_recurse()

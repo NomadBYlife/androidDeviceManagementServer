@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Web Socket client</title>
+</head>
+<body>
+<h1>HELLOOOOO</h1>
+<input id="message-input_IP" type="text" size="100" placeholder="IP"><br>
+<input id="message-input_PORT" type="text" size="100" placeholder="PORT"><br>
+<input id="message-input_desc" type="text" size="100" placeholder="description"><br>
+<input id="message-input_status" type="text" size="100" placeholder="status"><br>
+<input id="message-input_priority" type="text" size="100" placeholder="priority"><br>
+<input id="message-submit" type="button" value="Send">
+{{ room_name|json_script:"room-name" }}
+<script>
+    const wsSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/socket_client/'
+    );
+
+    wsSocket.onclose = function (e) {
+        console.error('Socket closed unexpectedly');
+    };
+
+    document.querySelector('#message-input_IP').focus();
+    document.querySelector('#message-input_IP').onkeyup = function (e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#message-submit').click();
+        }
+    };
+
+    document.querySelector('#message-submit').onclick = function (e) {
+        const messageInputIP = document.querySelector('#message-input_IP');
+        const messageInputPORT = document.querySelector('#message-input_PORT');
+        const messageInputDesc = document.querySelector('#message-input_desc');
+        const messageInputStatus = document.querySelector('#message-input_status');
+        const messageInputPriority = document.querySelector('#message-input_priority');
+        const IP = messageInputIP.value;
+        const PORT = messageInputPORT.value;
+        const desc = messageInputDesc.value;
+        const status = messageInputStatus.value;
+        const priority = messageInputPriority.value;
+        wsSocket.send(JSON.stringify({
+            'IP': IP,
+            'PORT': PORT,
+            'desc': desc,
+            'status': status,
+            'priority': priority,
+        }));
+        messageInputIP.value = '';
+        messageInputPORT.value = '';
+    };
+</script>
+</body>
+</html>

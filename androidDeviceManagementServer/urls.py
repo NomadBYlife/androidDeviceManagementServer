@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path('admin/', admin.site.urls),
     path('devices/', include('devices.urls')),
+    path('socket_client/', include('socket_client.urls')),
     url('favicon.ico', HttpResponse),
 ]

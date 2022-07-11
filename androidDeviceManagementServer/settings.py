@@ -48,6 +48,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'emulators1.testagent.dev.kobil.com',
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admindocs',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,6 +59,7 @@ INSTALLED_APPS = [
     'devices.apps.DevicesConfig',
     'background_task',
     'notifications',
+    'socket_client',
 ]
 
 MIDDLEWARE = [
@@ -201,3 +203,14 @@ DEFAULT_LOGGING['loggers']['django.server'].update({
         'level': 'DEBUG',
 })
 """
+
+# Конфигурация Channels
+ASGI_APPLICATION = "androidDeviceManagementServer.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
